@@ -19,13 +19,13 @@ data "aws_internet_gateway" "default_igw" {
 }
 
 resource "aws_subnet" "subnet_public" {
-  cidr_block        = var.subnet_public
-  vpc_id            = data.aws_vpc.vpc_default.id
-  availability_zone = var.availability_zone
-  map_public_ip_on_launch = false
+  cidr_block              = var.subnet_public
+  vpc_id                  = data.aws_vpc.vpc_default.id
+  availability_zone       = var.availability_zone
+  map_public_ip_on_launch = true
 }
 
 resource "aws_route_table_association" "rt_association" {
   route_table_id = data.aws_vpc.vpc_default.main_route_table_id
-  subnet_id = aws_subnet.subnet_public.id
+  subnet_id      = aws_subnet.subnet_public.id
 }

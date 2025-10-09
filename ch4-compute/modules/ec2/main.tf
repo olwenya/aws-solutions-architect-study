@@ -14,29 +14,26 @@ module "vpc" {
 data "http" "myip" {
   url = "https://ipv4.icanhazip.com"
 }
-   
+
 
 resource "aws_launch_template" "aws_exam_launch_template" {
   instance_type = var.instance_type
   image_id      = "ami-${var.ami_id}"
-
-  network_interfaces {
-    security_groups = [aws_security_group.ssh_sg.id]
-    associate_public_ip_address = true
-    subnet_id                   = module.vpc.subnet_id
-    delete_on_termination       = true 
-  }
+  vpc_security_group_ids = [aws_security_group.ssh_sg.id]
 }
 
-resource "aws_instance" "aws_exam_ec2" {
+resource "aws_autoscaling_group" "asg" {
   launch_template {
     id = aws_launch_template.aws_exam_launch_template.id
   }
-  subnet_id = module.vpc.subnet_id
+  vpc_zone_identifier = [ module.vpc.subnet_id ]
+
+  max_size = 1
+  min_size = 1
 }
 
 resource "aws_security_group" "ssh_sg" {
-  vpc_id      = module.vpc.vpc_id
+  vpc_id = module.vpc.vpc_id
 
   # SSH inbound rule
   ingress {
