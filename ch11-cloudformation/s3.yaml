@@ -1,0 +1,27 @@
+Description: 'A simple CloudFormation template to deploy an S3 bucket'
+
+Parameters:
+    Prefix:
+        Type: String
+        Default: saaco3
+    Versioning:
+        Default: false
+        Type: String
+        AllowedValues: [true, false]
+
+Conditions:
+    CreateVersioning: !Equals
+    - !Ref Versioning
+    - true
+
+Resources:
+    S3Bucket:
+        Type: AWS::S3::Bucket
+        Properties:
+            BucketName: !Sub "${Prefix}-${AWS::Region}-bucket"
+            VersioningConfiguration:
+                !If
+                - CreateVersioning
+                -
+                  Status: Enabled
+                - !Ref "AWS::NoValue"
